@@ -1,0 +1,5 @@
+- Go to https://riven.market/profile
+- Press `Ctrl + Shift + I`
+- Open _Console_ section
+- Copypaste the script from `index.js` to the console
+- `Enter`
