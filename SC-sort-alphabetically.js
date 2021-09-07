@@ -1,16 +1,20 @@
 /**
  * Go to playlist page -> open console -> copy & run this script
  * Go to 'network' tab in console -> clear it -> in 'Filter' field type 'playlist'
- * (back in playlist) Edit -> Tracks -> Swap first two tracks -> Save changes
+ * On page that opened to you - swap first two tracks -> Save changes
  * In console there gonna be 1 xhr request -> RMC -> Copy -> Copy as fetch
  * Paste in console -> Enter
  * Done
  */
 
-(function () {
-  // const fetchCopy = window.fetch;
+(function async() {
+  const fetchCopy = window.fetch;
 
-  window.fetch = (url, options) => {
+  openEditTracklist();
+
+  window.fetch = async (url, options) => {
+    await openEditTracklist(); // first open 'edit tracks' tab
+
     const { playlist } = JSON.parse(options.body);
 
     // swap 1st & 2nd track ids due to required step above
@@ -19,28 +23,40 @@
     playlist.tracks[1] = t;
 
     playlist.tracks = [
-      ...document.querySelectorAll('.editTrackList__list.sc-list-nostyle li'),
+      ...document.querySelectorAll(".editTrackList__list.sc-list-nostyle li"),
     ]
       .map((el, i) => ({ id: playlist.tracks[i], el }))
       .sort((elemA, elemB) => {
         const selector =
-          '.editTrackItem__content.sc-media-content span.sc-link-light';
-        const nameA = elemA.el.querySelector(selector).innerText;
-        const nameB = elemB.el.querySelector(selector).innerText;
+          ".editTrackItem__content.sc-media-content span.sc-link-light";
+        const nameA = elemA.el.querySelector(selector).innerText.toLowerCase();
+        const nameB = elemB.el.querySelector(selector).innerText.toLowerCase();
         if (nameA < nameB) return -1;
         else if (nameA > nameB) return 1;
         return 0;
       })
-      .map(el => el.id);
+      .map((el) => el.id);
 
     playlist.track_count === playlist.tracks.length &&
       fetchCopy(url, {
         ...options,
         body: JSON.stringify({ playlist }),
-      });
+      }).then(() => window.location.reload());
 
-    // window.fetch = fetchCopy
+    window.fetch = fetchCopy;
   };
+
+  function openEditTracklist() {
+    return new Promise((res) => {
+      document.querySelector(".sc-button-edit").click();
+
+      // any other way to know if everything is loaded and 'tracks' tab is clickable ?
+      setTimeout(() => {
+        document.querySelector(".g-tabs .g-tabs-item:nth-child(2) a").click();
+        setTimeout(res, 1000);
+      }, 1500);
+    });
+  }
 })();
 
 /**
