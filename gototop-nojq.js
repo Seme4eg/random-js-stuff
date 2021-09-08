@@ -10,8 +10,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   window.addEventListener('scroll', check);
 
-  // ------------------- easeOut go to top ----------------------
-
   let body = document.documentElement;
 
   up.onclick = function () {
@@ -27,7 +25,6 @@ document.addEventListener('DOMContentLoaded', function () {
     return 1 - Math.sin(Math.acos(timeFraction));
   }
 
-  // преобразователь в easeOut
   function makeEaseOut(timing) {
     return function (timeFraction) {
       return 1 - timing(1 - timeFraction);
