@@ -8,6 +8,7 @@
  */
 
 (function async() {
+  // we need to save default fetch to be able to restore it after
   const fetchCopy = window.fetch;
 
   openEditTracklist();
@@ -16,11 +17,6 @@
     await openEditTracklist(); // first open 'edit tracks' tab
 
     const { playlist } = JSON.parse(options.body);
-
-    // swap 1st & 2nd track ids due to required step above
-    const t = playlist.tracks[0];
-    playlist.tracks[0] = playlist.tracks[1];
-    playlist.tracks[1] = t;
 
     playlist.tracks = [
       ...document.querySelectorAll('.editTrackList__list.sc-list-nostyle li'),
@@ -31,9 +27,7 @@
           '.editTrackItem__content.sc-media-content span.sc-link-light';
         const nameA = elemA.el.querySelector(selector).innerText.toLowerCase();
         const nameB = elemB.el.querySelector(selector).innerText.toLowerCase();
-        if (nameA < nameB) return -1;
-        else if (nameA > nameB) return 1;
-        return 0;
+        return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
       })
       .map(el => el.id);
 
